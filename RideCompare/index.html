@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RideCompare – Porównaj ceny przejazdów</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span class="logo-icon">🚗</span>
+      <span class="logo-text">Ride<strong>Compare</strong></span>
+    </div>
+    <p class="tagline">Porównaj ceny Uber, Bolt i FreeNow w jednym miejscu</p>
+  </header>
+
+  <main>
+    <section class="search-card">
+      <div class="field-group">
+        <div class="input-wrap">
+          <span class="pin pickup-pin">A</span>
+          <input
+            id="pickup"
+            type="text"
+            placeholder="Skąd jedziesz?"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <div class="suggestions" id="pickup-suggestions"></div>
+        </div>
+
+        <div class="swap-btn-wrap">
+          <button class="swap-btn" id="swap-btn" title="Zamień miejsca">⇅</button>
+        </div>
+
+        <div class="input-wrap">
+          <span class="pin drop-pin">B</span>
+          <input
+            id="dropoff"
+            type="text"
+            placeholder="Dokąd jedziesz?"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <div class="suggestions" id="dropoff-suggestions"></div>
+        </div>
+      </div>
+
+      <div class="options-row">
+        <label class="option-label">
+          <span>Liczba pasażerów</span>
+          <select id="passengers">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+        </label>
+        <label class="option-label">
+          <span>Pora dnia</span>
+          <select id="time-of-day">
+            <option value="normal">Normalna</option>
+            <option value="peak">Szczyt (7–9, 16–19)</option>
+            <option value="night">Nocna (22–6)</option>
+          </select>
+        </label>
+      </div>
+
+      <button class="compare-btn" id="compare-btn">
+        <span id="btn-text">Porównaj ceny</span>
+        <span id="btn-spinner" class="spinner hidden"></span>
+      </button>
+
+      <p class="disclaimer">
+        Ceny są szacunkowe i mogą różnić się od rzeczywistych. Dokładna cena zależy od ruchu drogowego i warunków.
+      </p>
+    </section>
+
+    <section id="results-section" class="results-section hidden">
+      <div class="results-header">
+        <div id="route-summary" class="route-summary"></div>
+      </div>
+      <div id="results-grid" class="results-grid"></div>
+    </section>
+
+    <section id="error-section" class="error-section hidden">
+      <div class="error-box">
+        <span class="error-icon">⚠️</span>
+        <p id="error-msg"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Dane cenowe oparte na przybliżonych taryfach dostawców. Nie jesteśmy powiązani z Uber, Bolt ani FreeNow.</p>
+  </footer>
+
+  <script src="js/providers.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
