@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MójBukiet.com — świeże bukiety w dobrej cenie</title>
+<meta name="description" content="Skomponuj swój bukiet kwiatów ciętych: piwonie, róże, lilie, tulipany. Świeże kwiaty w dobrej cenie z dostawą w 24h.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="frame">
+
+  <header class="top">
+    <div class="brand">
+      <div class="logo">Mój<em>Bukiet</em><span>.com</span></div>
+      <div class="tagline">świeże kwiaty cięte &middot; dobra cena &middot; dostawa w 24&nbsp;h</div>
+    </div>
+    <div class="divider" aria-hidden="true"><span class="heart">♥</span></div>
+    <ol class="steps" id="steps"></ol>
+  </header>
+
+  <main class="grid">
+
+    <!-- Lewy panel: opcje bieżącego kroku -->
+    <section class="card panel" id="panel" aria-live="polite"></section>
+
+    <!-- Scena z bukietem -->
+    <section class="stage" id="stage">
+      <div class="photo-float">
+        <div class="photo-card" id="photoCard">
+          <canvas id="layerA" class="layer" width="660" height="825"></canvas>
+          <canvas id="layerB" class="layer" width="660" height="825"></canvas>
+          <div class="size-chip" id="sizeChip">20 szt · M</div>
+          <div class="addon-badge" id="badgeChoc"><span class="e">🍫</span>bombonierka</div>
+          <div class="addon-badge" id="badgeRibbon"><span class="e">🎀</span>wstążka premium</div>
+          <div class="addon-badge" id="badgeCard"><span class="e">💌</span>bilecik</div>
+        </div>
+      </div>
+      <div class="stage-caption" id="stageCaption"></div>
+    </section>
+
+    <!-- Prawy panel: podsumowanie i nawigacja -->
+    <aside class="card summary" id="summaryCard">
+      <div class="pill pill-outline">TWÓJ BUKIET</div>
+      <ul class="sum-list" id="sumList"></ul>
+      <div class="price-box">
+        <div class="price-old" id="priceOld"></div>
+        <div class="price-now"><span id="priceNow">0</span>&nbsp;zł</div>
+        <div class="price-save" id="priceSave"></div>
+      </div>
+      <button class="btn-next" id="btnNext">DALEJ <span class="arrow">→</span></button>
+      <button class="btn-back" id="btnBack">← wróć</button>
+      <div class="trust">
+        <span>🚚 dostawa w 24 h</span>
+        <span>🌸 świeżość 7 dni</span>
+        <span>💳 płatność online</span>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="bottom">
+    <div class="divider" aria-hidden="true"><span class="heart">♥</span></div>
+    <p>MójBukiet.com — bukiety kwiatów ciętych w dobrej cenie. Piwonie, róże, lilie i tulipany prosto od plantatorów.</p>
+    <p class="credits">Zdjęcia poglądowe (kadrowane i przebarwiane): Wikimedia Commons —
+      <a href="https://commons.wikimedia.org/wiki/File:Peony_vase_(Unsplash).jpg">piwonie</a> A.&nbsp;Seinet (CC0) ·
+      <a href="https://commons.wikimedia.org/wiki/File:Bouquet_de_roses_roses.jpg">róże</a> © Jebulon (CC&nbsp;BY-SA&nbsp;3.0) ·
+      <a href="https://commons.wikimedia.org/wiki/File:Lirio_Rosa.jpg">lilie</a> © BlueZuko (CC&nbsp;BY-SA&nbsp;4.0) ·
+      <a href="https://commons.wikimedia.org/wiki/File:Bouquet-3175315_1920.jpg">tulipany</a> Yuri_B (CC0)</p>
+  </footer>
+</div>
+
+<!-- Modal potwierdzenia -->
+<div class="modal" id="modal" hidden>
+  <div class="modal-card">
+    <div class="modal-emoji">💐</div>
+    <h2>Dziękujemy!</h2>
+    <p id="modalText"></p>
+    <p class="modal-note">To podgląd sklepu — zamówienia demo nie są realizowane.</p>
+    <button class="btn-next" id="btnCloseModal">WRÓĆ DO BUKIETU</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
