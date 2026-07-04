@@ -1,0 +1,6 @@
+interface:
+  display_name: "Supar"
+  short_description: "Repo-specific patterns and workflows for Supar"
+  default_prompt: "Use the Supar repo skill to follow existing architecture, testing, and workflow conventions."
+policy:
+  allow_implicit_invocation: true
