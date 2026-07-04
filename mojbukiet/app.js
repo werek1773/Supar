@@ -1,6 +1,5 @@
-/* ─── MójBukiet.com — konfigurator bukietów ─────────────────────── */
+/* ─── MójBukiet.com — konfigurator bukietów (wersja foto) ───────── */
 'use strict';
-const NS = 'http://www.w3.org/2000/svg';
 
 /* ── dane ── */
 const SPECIES = [
@@ -11,21 +10,21 @@ const SPECIES = [
 ];
 
 const SIZES = [
-  { id: 'S',   stems: 10, who: 'dla koleżanki',   heads: 7,  scale: 0.78, off: 0    },
-  { id: 'M',   stems: 20, who: 'dla dziewczyny',  heads: 10, scale: 0.88, off: 0.05 },
-  { id: 'L',   stems: 40, who: 'dla tej jedynej', heads: 13, scale: 1.00, off: 0.10 },
-  { id: 'XL',  stems: 70, who: 'dla żony',        heads: 16, scale: 1.10, off: 0.15 },
-  { id: 'XXL', stems: 80, who: 'DLA TEŚCIOWEJ',   heads: 19, scale: 1.18, off: 0.20 },
+  { id: 'S',   stems: 10, who: 'dla koleżanki',   scale: 0.82, off: 0    },
+  { id: 'M',   stems: 20, who: 'dla dziewczyny',  scale: 0.90, off: 0.05 },
+  { id: 'L',   stems: 40, who: 'dla tej jedynej', scale: 0.97, off: 0.10 },
+  { id: 'XL',  stems: 70, who: 'dla żony',        scale: 1.03, off: 0.15 },
+  { id: 'XXL', stems: 80, who: 'DLA TEŚCIOWEJ',   scale: 1.09, off: 0.20 },
 ];
 const SIZE_LETTER_COLORS = ['#ef8fa6', '#e2557e', '#c73a63', '#a52a50', '#8e2043'];
 
 const COLORS = [
-  { id: 'jasny',   name: 'jasny różowy', hex: '#f6c4d2' },
-  { id: 'lososiowy', name: 'łososiowy',  hex: '#f4b57e' },
-  { id: 'rozowy',  name: 'różowy',       hex: '#ee8f9e' },
-  { id: 'fiolet',  name: 'fioletowy',    hex: '#e3d0f5' },
-  { id: 'ciemny',  name: 'ciemny róż',   hex: '#d4407a' },
-  { id: 'bordo',   name: 'bordowy',      hex: '#8e2043' },
+  { id: 'jasny',     name: 'jasny różowy', hex: '#f6c4d2' },
+  { id: 'lososiowy', name: 'łososiowy',    hex: '#f4b57e' },
+  { id: 'rozowy',    name: 'różowy',       hex: '#ee8f9e' },
+  { id: 'fiolet',    name: 'fioletowy',    hex: '#cba8ec' },
+  { id: 'ciemny',    name: 'ciemny róż',   hex: '#d4407a' },
+  { id: 'bordo',     name: 'bordowy',      hex: '#8e2043' },
 ];
 
 const EXTRAS = [
@@ -42,6 +41,14 @@ const STEPS = [
   { id: 'koszyk',   label: 'KOSZYK' },
 ];
 
+/* źródła zdjęć — build Artifactu podmienia ścieżki na data URI */
+const PHOTO_SRC = {
+  piwonie: 'img/piwonie.jpg',
+  roze: 'img/roze.jpg',
+  lilie: 'img/lilie.jpg',
+  tulipany: 'img/tulipany.jpg',
+};
+
 const state = {
   step: 0,
   species: 'piwonie',
@@ -53,155 +60,135 @@ const state = {
 const $ = (s) => document.querySelector(s);
 const byId = (arr, id) => arr.find((x) => x.id === id);
 
-/* ── kolory pomocnicze ── */
-function shade(hex, amt) { // amt -1..1 : miesza z czernią (ujemne) lub bielą (dodatnie)
+/* ── konwersje kolorów ── */
+function hexToHsl(hex) {
   const n = parseInt(hex.slice(1), 16);
-  const t = amt < 0 ? 0 : 255, p = Math.abs(amt);
-  const ch = (v) => Math.round(v + (t - v) * p);
-  const [r, g, b] = [n >> 16 & 255, n >> 8 & 255, n & 255].map(ch);
-  return `rgb(${r},${g},${b})`;
+  return rgbToHsl(n >> 16 & 255, n >> 8 & 255, n & 255);
+}
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let h;
+  if (max === r) h = ((g - b) / d + (g < b ? 6 : 0));
+  else if (max === g) h = (b - r) / d + 2;
+  else h = (r - g) / d + 4;
+  return [h * 60, s, l];
+}
+function hslToRgb(h, s, l) {
+  h = ((h % 360) + 360) % 360 / 360;
+  if (s === 0) { const v = Math.round(l * 255); return [v, v, v]; }
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  const f = (t) => {
+    if (t < 0) t += 1; if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+  return [Math.round(f(h + 1 / 3) * 255), Math.round(f(h) * 255), Math.round(f(h - 1 / 3) * 255)];
 }
 
-/* ── generatory kształtów kwiatów ── */
-function scallop(r, bumps, phase = 0) { // falbaniasty okrąg (płatki piwonii/róży)
-  const P = (a) => `${(r * Math.cos(a)).toFixed(1)},${(r * Math.sin(a)).toFixed(1)}`;
-  let d = `M ${P(phase)}`;
-  for (let k = 1; k <= bumps; k++) {
-    const mid = phase + ((k - 0.5) / bumps) * 2 * Math.PI;
-    const end = phase + (k / bumps) * 2 * Math.PI;
-    d += ` Q ${(r * 1.38 * Math.cos(mid)).toFixed(1)},${(r * 1.38 * Math.sin(mid)).toFixed(1)} ${P(end)}`;
+/* ── silnik foto: przebarwianie kwiatów na canvasie ── */
+const REF = hexToHsl(COLORS[0].hex); // "jasny różowy" = kolor neutralny dla zdjęć bazowych
+
+function greenFade(h) { // 0 dla zieleni (liście, łodygi), 1 poza nią, miękkie brzegi
+  if (h <= 52 || h >= 185) return 1;
+  if (h < 62) return (62 - h) / 10;
+  if (h > 175) return (h - 175) / 10;
+  return 0;
+}
+
+function recolorPixels(ctx, w, h, hex) {
+  const [tH, tS, tL] = hexToHsl(hex);
+  const sFac = Math.min(1.6, Math.max(0.3, tS / REF[1]));
+  const lFac = Math.min(1.25, Math.max(0.45, tL / REF[2]));
+  const id = ctx.getImageData(0, 0, w, h);
+  const d = id.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const [hh, ss, ll] = rgbToHsl(d[i], d[i + 1], d[i + 2]);
+    if (ss < 0.16) continue;               // biele, szarości, wazon, papier
+    const fade = greenFade(hh);
+    if (fade === 0) continue;              // zieleń zostaje zielenią
+    const t = Math.min(1, (ss - 0.16) / 0.15) * fade;
+    const [r, g, b] = hslToRgb(tH, Math.min(1, ss * sFac), Math.min(0.97, ll * lFac));
+    d[i]     += (r - d[i]) * t;
+    d[i + 1] += (g - d[i + 1]) * t;
+    d[i + 2] += (b - d[i + 2]) * t;
   }
-  return d + ' Z';
+  ctx.putImageData(id, 0, 0);
 }
 
-const ROSE_SPIRAL =
-  'M2,-1 a3,3 0 0 1 -5,1 a5,5 0 0 1 9,-3 a8.5,8.5 0 0 1 -16,6 a12,12 0 0 1 21,-10 a16,16 0 0 1 -27,14';
-
-function lilyPetals() {
-  let out = '';
-  for (let k = 0; k < 6; k++) {
-    out += `<path class="petal-a" transform="rotate(${k * 60})"
-      d="M0,-3 C -7,-11 -11,-23 0,-35 C 11,-23 7,-11 0,-3 Z"/>`;
-  }
-  return out;
-}
-
-/* markup jednego kwiatu; klasy petal-a/petal-b/lines służą do przemalowania */
-const SYMBOLS = {
-  piwonie: () => `
-    <path class="petal-a" d="${scallop(26, 8)}"/>
-    <path class="petal-b" d="${scallop(15, 6, 0.4)}" transform="translate(2,-3)"/>
-    <path class="lines" fill="none" stroke-linecap="round"
-      d="M-7,-4 q 5,-8 12,-3 M-3,6 q 6,-3 9,2 M-11,3 q 2,-7 7,-6"/>`,
-  roze: () => `
-    <path class="petal-a" d="${scallop(24, 6, 0.5)}"/>
-    <path class="lines" fill="none" stroke-linecap="round" d="${ROSE_SPIRAL}"/>`,
-  lilie: () => `
-    ${lilyPetals()}
-    <circle class="lines" r="4.5" fill="#e9b64f" stroke="none"/>
-    <path class="lines" fill="none" stroke-linecap="round"
-      d="M0,-6 l -3,-9 M0,-6 l 3,-9 M0,-6 l 0,-11"/>`,
-  tulipany: () => `
-    <path class="petal-a" transform="scale(1.15)"
-      d="M0,24 C -16,20 -24,6 -21,-14 C -19,-26 -8,-27 -6,-13 C -5,-24 5,-24 6,-13 C 8,-27 19,-26 21,-14 C 24,6 16,20 0,24 Z"/>
-    <path class="lines" fill="none" stroke-linecap="round" d="M-7,-12 C -8,2 -7,12 -5,20 M7,-12 C 8,2 7,12 5,20"/>`,
-};
-
-const LEAF = (rot) => `
-  <path class="leaf" transform="rotate(${rot}) translate(0,4)" fill="#5d8f4c" stroke="#3f6b33"
-    stroke-width="2" stroke-linejoin="round"
-    d="M0,0 C -13,-5 -21,-17 -19,-31 C -5,-27 3,-14 0,0 Z"/>`;
-
-/* ── rozmieszczenie kwiatów: spirala złotego kąta (stabilna po prefiksie) ── */
-function layout(n) {
-  const pts = [];
-  for (let i = 0; i < n; i++) {
-    const a = i * 2.39996 + 0.7;
-    const rad = 31 * Math.sqrt(i + 0.55);
-    pts.push({
-      x: Math.cos(a) * rad * 1.22,
-      y: -102 + Math.sin(a) * rad * 0.8,
-      rot: ((i * 47) % 25) - 12,
-      s: 1.04 + ((i * 29) % 5) * 0.05,
+const imgPromises = {};
+function loadImg(sp) {
+  if (!imgPromises[sp]) {
+    imgPromises[sp] = new Promise((resolve, reject) => {
+      const im = new Image();
+      im.onload = () => resolve(im);
+      im.onerror = reject;
+      im.src = PHOTO_SRC[sp];
     });
   }
-  return pts;
+  return imgPromises[sp];
 }
 
-/* ── warstwa kwiatów ── */
-const flowersLayer = $('#flowers');
-let flowerEls = [];
-
-function flowerTransform(p, scale = 1) {
-  return `translate(${p.x.toFixed(1)}px,${p.y.toFixed(1)}px) rotate(${p.rot}deg) scale(${(p.s * scale).toFixed(3)})`;
-}
-
-function paintMarkup(el) {
-  const c = byId(COLORS, state.color).hex;
-  el.querySelectorAll('.petal-a').forEach((p) => { p.setAttribute('fill', c); p.setAttribute('stroke', shade(c, -0.42)); p.setAttribute('stroke-width', '2.6'); p.setAttribute('stroke-linejoin', 'round'); });
-  el.querySelectorAll('.petal-b').forEach((p) => { p.setAttribute('fill', shade(c, 0.22)); p.setAttribute('stroke', shade(c, -0.42)); p.setAttribute('stroke-width', '2.2'); p.setAttribute('stroke-linejoin', 'round'); });
-  el.querySelectorAll('.lines').forEach((p) => { if (!p.getAttribute('fill') || p.getAttribute('fill') === 'none') p.setAttribute('stroke', shade(c, -0.45)); p.setAttribute('stroke-width', p.getAttribute('stroke-width') || '2.2'); });
-}
-
-function makeFlower(i, p) {
-  const g = document.createElementNS(NS, 'g');
-  g.setAttribute('class', 'flower');
-  g.innerHTML = (i % 2 ? LEAF(80 + (i * 67) % 200) : '') + SYMBOLS[state.species]();
-  paintMarkup(g);
-  // start: schowany nisko przy rożku, potem sprężynowy „wystrzał” na miejsce
-  g.style.transform = `translate(${(p.x * 0.3).toFixed(1)}px,${(p.y * 0.3 - 20).toFixed(1)}px) rotate(${p.rot}deg) scale(0)`;
-  g.style.opacity = '0';
-  return g;
-}
-
-function popIn(el, p, delay) {
-  el.getBoundingClientRect(); // wymuś zatwierdzenie stanu startowego, by transition ruszyła
-  el.style.transitionDelay = `${delay}ms, ${delay}ms`;
-  el.style.transform = flowerTransform(p);
-  el.style.opacity = '1';
-  setTimeout(() => { el.style.transitionDelay = '0ms'; }, delay + 850);
-}
-
-function popOut(el, delay) {
-  el.style.transitionDelay = `${delay}ms, ${delay}ms`;
-  el.style.transform += ' scale(0.01)';
-  el.style.opacity = '0';
-  setTimeout(() => el.remove(), delay + 700);
-}
-
-function setHeads(n) {
-  const pts = layout(Math.max(n, flowerEls.length));
-  while (flowerEls.length > n) popOut(flowerEls.pop(), (flowerEls.length - n) * 40);
-  const firstNew = flowerEls.length;
-  for (let i = firstNew; i < n; i++) {
-    const el = makeFlower(i, pts[i]);
-    flowersLayer.appendChild(el);
-    flowerEls.push(el);
-    popIn(el, pts[i], (i - firstNew) * 60);
+const tintCache = new Map();
+async function tintedCanvas(sp, colorId) {
+  const key = `${sp}|${colorId}`;
+  if (tintCache.has(key)) return tintCache.get(key);
+  const img = await loadImg(sp);
+  const c = document.createElement('canvas');
+  c.width = 660; c.height = 825;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0, c.width, c.height);
+  try {
+    recolorPixels(ctx, c.width, c.height, byId(COLORS, colorId).hex);
+  } catch {
+    // canvas "tainted" (podgląd z file://) — pokaż zdjęcie bez przebarwienia
   }
+  tintCache.set(key, c);
+  return c;
 }
 
-function rebuildSpecies() { // podmiana gatunku: stare znikają, nowe wyrastają
-  const old = flowerEls;
-  flowerEls = [];
-  old.forEach((el, i) => popOut(el, i * 22));
-  setTimeout(() => setHeads(byId(SIZES, state.size).heads), old.length * 22 + 160);
+/* crossfade między dwiema warstwami canvas */
+let activeLayer = 0, showToken = 0;
+async function showPhoto() {
+  const my = ++showToken;
+  let src;
+  try {
+    src = await tintedCanvas(state.species, state.color);
+  } catch {
+    return; // brak zdjęcia — zostaje tło karty
+  }
+  if (my !== showToken) return;
+  const layers = [$('#layerA'), $('#layerB')];
+  const next = layers[1 - activeLayer], cur = layers[activeLayer];
+  next.width = src.width; next.height = src.height;
+  next.getContext('2d').drawImage(src, 0, 0);
+  next.getBoundingClientRect(); // zatwierdź stan startowy przejścia
+  next.classList.add('show');
+  cur.classList.remove('show');
+  activeLayer = 1 - activeLayer;
 }
 
-function recolor() {
-  flowersLayer.querySelectorAll('.flower').forEach(paintMarkup);
-}
-
+/* ── rozmiar: sprężyste skalowanie karty + chip z liczbą ── */
 function applySize() {
   const s = byId(SIZES, state.size);
-  $('#bouquetScale').style.transform = `scale(${s.scale})`;
-  setHeads(s.heads);
+  $('#photoCard').style.transform = `scale(${s.scale})`;
+  const chip = $('#sizeChip');
+  chip.textContent = `${s.stems} szt · ${s.id}`;
+  chip.classList.remove('pop');
+  chip.getBoundingClientRect();
+  chip.classList.add('pop');
 }
 
 function applyExtras() {
-  $('#addonChoc').classList.toggle('on', state.extras.has('bombonierka'));
-  $('#addonCard').classList.toggle('on', state.extras.has('bilecik'));
-  $('#bow').classList.toggle('premium', state.extras.has('wstazka'));
+  $('#badgeChoc').classList.toggle('on', state.extras.has('bombonierka'));
+  $('#badgeRibbon').classList.toggle('on', state.extras.has('wstazka'));
+  $('#badgeCard').classList.toggle('on', state.extras.has('bilecik'));
 }
 
 /* ── cena ── */
@@ -237,13 +224,6 @@ function renderSteps() {
     li.addEventListener('click', () => go(+li.dataset.step)));
 }
 
-function speciesIcon(id) {
-  const g = document.createElementNS(NS, 'g');
-  g.innerHTML = SYMBOLS[id]();
-  paintMarkup(g);
-  return `<svg class="flower-ico" viewBox="-36 -40 72 78" aria-hidden="true">${g.innerHTML}</svg>`;
-}
-
 const CHECK = '<span class="check">✓</span>';
 
 function renderPanel() {
@@ -256,7 +236,7 @@ function renderPanel() {
     html = `<div class="pill">GATUNEK</div><div class="panel-sub">jakie kwiaty mówią to, co czujesz?</div>
       <div class="options">${SPECIES.map((s) => `
         <button class="opt ${s.id === state.species ? 'sel' : ''}" data-species="${s.id}">
-          ${speciesIcon(s.id)}
+          <span class="opt-thumb" style="background-image:url('${PHOTO_SRC[s.id]}')"></span>
           <span><span class="opt-name">${s.name}</span><br>
             <span class="opt-sub">${s.sub}</span><br>
             <span class="opt-price">od ${s.price * SIZES[0].stems} zł</span></span>
@@ -327,7 +307,7 @@ function renderPanel() {
   panel.querySelectorAll('[data-species]').forEach((b) => b.addEventListener('click', () => {
     if (state.species === b.dataset.species) return;
     state.species = b.dataset.species;
-    rebuildSpecies(); refresh();
+    showPhoto(); refresh();
   }));
   panel.querySelectorAll('[data-size]').forEach((b) => b.addEventListener('click', () => {
     if (state.size === b.dataset.size) return;
@@ -336,7 +316,7 @@ function renderPanel() {
   }));
   panel.querySelectorAll('[data-color]').forEach((b) => b.addEventListener('click', () => {
     state.color = b.dataset.color;
-    recolor(); refresh();
+    showPhoto(); refresh();
   }));
   panel.querySelectorAll('[data-extra]').forEach((b) => b.addEventListener('click', () => {
     const id = b.dataset.extra;
@@ -406,6 +386,10 @@ if (byId(COLORS, q.get('kolor'))) state.color = q.get('kolor');
 const krok = parseInt(q.get('krok'), 10);
 if (krok >= 1 && krok <= STEPS.length) state.step = krok - 1;
 
+showPhoto();
 applySize();
 applyExtras();
 refresh();
+
+/* dogrzej cache pozostałych gatunków w tle */
+setTimeout(() => SPECIES.forEach((s) => loadImg(s.id).catch(() => {})), 1500);

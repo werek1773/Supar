@@ -30,76 +30,16 @@
 
     <!-- Scena z bukietem -->
     <section class="stage" id="stage">
-      <svg id="scene" viewBox="-300 -360 600 720" role="img" aria-label="Podgląd Twojego bukietu">
-        <g id="sway">
-          <g id="bouquetScale">
-            <!-- cień -->
-            <ellipse cx="0" cy="330" rx="120" ry="16" fill="#f0cfd9" opacity=".55"/>
-
-            <!-- łodygi pod związaniem -->
-            <g id="stems" stroke="#4d7c3b" stroke-width="4.5" stroke-linecap="round" fill="none">
-              <path d="M-4,228 C -18,268 -30,296 -38,318"/>
-              <path d="M-2,230 C -8,268 -14,300 -16,322"/>
-              <path d="M0,230 C 1,270 2,300 2,326"/>
-              <path d="M2,230 C 9,266 16,298 20,320"/>
-              <path d="M4,228 C 20,264 32,292 40,314"/>
-              <path d="M-3,229 C -26,262 -44,286 -54,304"/>
-              <path d="M3,229 C 28,260 46,284 56,302"/>
-            </g>
-
-            <!-- tył rożka (wnętrze papieru, za kwiatami) -->
-            <path d="M-150,-15 Q 0,-98 150,-15 L 0,233 Z" fill="#f3e3cd" stroke="#4d7c3b" stroke-width="3.5" stroke-linejoin="round"/>
-
-            <!-- warstwa kwiatów (JS) -->
-            <g id="flowers"></g>
-
-            <!-- przód rożka -->
-            <g id="cone">
-              <path d="M-150,-15 Q 0,46 150,-15 L 0,233 Z" fill="#f8ecd9" stroke="#4d7c3b" stroke-width="3.5" stroke-linejoin="round"/>
-              <path d="M-141,-8 Q 0,38 141,-8" fill="none" stroke="#4d7c3b" stroke-width="2" opacity=".55"/>
-              <path d="M-136,3 L -3,226 M136,3 L 3,226" fill="none" stroke="#4d7c3b" stroke-width="2" opacity=".45"/>
-            </g>
-
-            <!-- wstążka: linie oplotu + kokarda -->
-            <g id="bow" fill="none" stroke-linecap="round" stroke-linejoin="round">
-              <g class="bow-stroke">
-                <path d="M-76,96 L 72,144 M -72,146 L 76,98"/>
-                <path d="M-2,128 C -58,98 -98,106 -90,140 C -83,171 -28,162 0,132"/>
-                <path d="M2,128 C 58,98 98,106 90,140 C 83,171 28,162 0,132"/>
-                <path d="M-2,131 C -44,110 -74,116 -69,139 C -64,159 -24,154 0,133"/>
-                <path d="M2,131 C 44,110 74,116 69,139 C 64,159 24,154 0,133"/>
-                <path d="M-9,124 q 9,-9 18,1 q -8,11 -18,-1 Z"/>
-                <path d="M-5,141 C -20,176 -25,204 -11,230"/>
-                <path d="M6,141 C 19,180 15,208 3,232"/>
-              </g>
-              <g class="bow-premium-extra">
-                <path d="M-11,236 C -18,252 -8,262 -14,276"/>
-                <path d="M4,238 C 12,254 2,264 9,280"/>
-                <path d="M-104,118 l 5,-11 5,11 11,4 -11,5 -5,11 -5,-11 -11,-5 Z" class="spark"/>
-                <path d="M99,152 l 4,-9 4,9 9,4 -9,4 -4,9 -4,-9 -9,-4 Z" class="spark"/>
-              </g>
-            </g>
-          </g><!-- /bouquetScale -->
-
-          <!-- dodatki (poza skalą bukietu, żeby nie rosły z rozmiarem) -->
-          <g transform="translate(196,196)">
-            <g id="addonChoc" class="addon">
-              <path d="M0,34 C -46,-2 -28,-52 0,-24 C 28,-52 46,-2 0,34 Z" fill="#b0355a" stroke="#7e2242" stroke-width="3.5" stroke-linejoin="round"/>
-              <path d="M-33,-9 C -12,-2 12,-2 33,-9" fill="none" stroke="#e9c26a" stroke-width="3.5" stroke-linecap="round"/>
-              <path d="M-7,-32 q 7,-8 14,0 M0,-30 l 0,-8" fill="none" stroke="#e9c26a" stroke-width="3" stroke-linecap="round"/>
-              <text y="60" class="addon-label">pralinki</text>
-            </g>
-          </g>
-          <g transform="translate(-204,210) rotate(-10)">
-            <g id="addonCard" class="addon">
-              <rect x="-46" y="-30" width="92" height="60" rx="10" fill="#fffaf3" stroke="#d9537e" stroke-width="3"/>
-              <path d="M-46,-14 L -62,-34" stroke="#d9537e" stroke-width="2.5" fill="none"/>
-              <text y="2" class="card-script">dla Ciebie</text>
-              <text y="21" class="card-heart">♥</text>
-            </g>
-          </g>
-        </g><!-- /sway -->
-      </svg>
+      <div class="photo-float">
+        <div class="photo-card" id="photoCard">
+          <canvas id="layerA" class="layer" width="660" height="825"></canvas>
+          <canvas id="layerB" class="layer" width="660" height="825"></canvas>
+          <div class="size-chip" id="sizeChip">20 szt · M</div>
+          <div class="addon-badge" id="badgeChoc"><span class="e">🍫</span>bombonierka</div>
+          <div class="addon-badge" id="badgeRibbon"><span class="e">🎀</span>wstążka premium</div>
+          <div class="addon-badge" id="badgeCard"><span class="e">💌</span>bilecik</div>
+        </div>
+      </div>
       <div class="stage-caption" id="stageCaption"></div>
     </section>
 
@@ -125,6 +65,11 @@
   <footer class="bottom">
     <div class="divider" aria-hidden="true"><span class="heart">♥</span></div>
     <p>MójBukiet.com — bukiety kwiatów ciętych w dobrej cenie. Piwonie, róże, lilie i tulipany prosto od plantatorów.</p>
+    <p class="credits">Zdjęcia poglądowe (kadrowane i przebarwiane): Wikimedia Commons —
+      <a href="https://commons.wikimedia.org/wiki/File:Peony_vase_(Unsplash).jpg">piwonie</a> A.&nbsp;Seinet (CC0) ·
+      <a href="https://commons.wikimedia.org/wiki/File:Bouquet_de_roses_roses.jpg">róże</a> © Jebulon (CC&nbsp;BY-SA&nbsp;3.0) ·
+      <a href="https://commons.wikimedia.org/wiki/File:Lirio_Rosa.jpg">lilie</a> © BlueZuko (CC&nbsp;BY-SA&nbsp;4.0) ·
+      <a href="https://commons.wikimedia.org/wiki/File:Bouquet-3175315_1920.jpg">tulipany</a> Yuri_B (CC0)</p>
   </footer>
 </div>
 

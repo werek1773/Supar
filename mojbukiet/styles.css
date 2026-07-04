@@ -168,58 +168,77 @@ body{
 .btn-order:hover{background:var(--pink-dark);transform:translateY(-2px)}
 .btn-order:active{transform:scale(.97)}
 
-/* ─── scena ─── */
-.stage{position:relative;display:flex;flex-direction:column;align-items:center}
-#scene{width:100%;max-width:560px;height:auto;overflow:visible}
+/* ─── scena: karta foto ─── */
+.stage{position:relative;display:flex;flex-direction:column;align-items:center;padding-top:36px}
+.photo-float{animation:floaty 6s ease-in-out infinite alternate}
+@keyframes floaty{from{transform:translateY(-4px) rotate(-.4deg)}to{transform:translateY(5px) rotate(.4deg)}}
+
+.photo-card{
+  position:relative;
+  width:min(400px,76vw);
+  aspect-ratio:4/5;
+  border-radius:47% 47% 26px 26px / 36% 36% 26px 26px;
+  overflow:hidden;
+  background:linear-gradient(180deg,#f6e7da,#eed9c8);
+  box-shadow:0 0 0 3px #fff,0 0 0 5.5px var(--rose),0 26px 60px rgba(140,52,84,.25);
+  transition:transform .9s var(--spring);
+  transform-origin:50% 62%;
+}
+.photo-card::after{ /* winieta wtapiająca zdjęcie w stronę */
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  box-shadow:inset 0 0 70px rgba(92,36,56,.22), inset 0 -30px 60px rgba(92,36,56,.12);
+}
+.photo-card .layer{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transform:scale(1.08);
+  transition:opacity .65s ease,transform 1s var(--spring);
+}
+.photo-card .layer.show{opacity:1;transform:scale(1)}
+
+.size-chip{
+  position:absolute;left:50%;bottom:16px;transform:translateX(-50%);
+  background:rgba(255,253,250,.94);color:var(--pink-deep);
+  font-weight:900;font-size:1rem;letter-spacing:.04em;
+  padding:8px 20px;border-radius:999px;
+  border:2px solid var(--pink);
+  box-shadow:0 6px 18px rgba(92,36,56,.25);
+  white-space:nowrap;z-index:3;
+}
+.size-chip.pop{animation:chip-pop .55s var(--spring)}
+@keyframes chip-pop{0%{transform:translateX(-50%) scale(.5)}100%{transform:translateX(-50%) scale(1)}}
+
+.addon-badge{
+  position:absolute;z-index:3;
+  display:flex;align-items:center;gap:7px;
+  background:rgba(255,253,250,.94);color:var(--pink-deep);
+  font-weight:800;font-size:.78rem;letter-spacing:.02em;
+  padding:7px 14px;border-radius:999px;
+  border:2px solid var(--rose);
+  box-shadow:0 8px 20px rgba(92,36,56,.22);
+  transform:scale(0) rotate(-14deg);opacity:0;
+  transition:transform .6s var(--spring),opacity .3s ease;
+  white-space:nowrap;
+}
+.addon-badge .e{font-size:1.15rem;line-height:1}
+.addon-badge.on{transform:scale(1) rotate(0deg);opacity:1}
+#badgeChoc{right:-8px;top:20%}
+#badgeRibbon{left:-14px;top:40%;border-color:var(--gold)}
+#badgeCard{right:-4px;top:58%}
+
 .stage-caption{
   font-family:'Caveat',cursive;font-size:1.5rem;color:var(--ink-soft);
-  margin-top:-8px;text-align:center;min-height:1.6em;
+  margin-top:20px;text-align:center;min-height:1.6em;
   transition:opacity .3s ease;
 }
 
-/* kołysanie bukietu */
-#sway{
-  transform-box:view-box;transform-origin:50% 78%;
-  animation:sway 7s ease-in-out infinite alternate;
+/* miniatury gatunków w panelu */
+.opt-thumb{
+  flex:none;width:58px;height:58px;border-radius:50%;
+  background-size:cover;background-position:center;
+  box-shadow:0 0 0 2.5px #fff,0 0 0 4.5px var(--rose-pale),0 4px 10px rgba(92,36,56,.2);
+  transition:transform .3s var(--spring);
 }
-@keyframes sway{from{transform:rotate(-1.1deg)}to{transform:rotate(1.1deg)}}
-
-/* skala bukietu = rozmiar */
-#bouquetScale{
-  transform-box:view-box;transform-origin:50% 50%;
-  transition:transform .9s var(--spring);
-}
-
-/* kwiaty */
-.flower{
-  transform-box:fill-box;transform-origin:center;
-  transition:transform .8s var(--spring),opacity .45s ease;
-}
-.flower.gone{opacity:0}
-.flower .petal-a,.flower .petal-b{transition:fill .6s ease,stroke .6s ease}
-.flower .lines{transition:stroke .6s ease}
-
-/* wstążka */
-.bow-stroke path{stroke:#d9537e;stroke-width:4;transition:stroke .5s ease}
-.bow-premium-extra{opacity:0;transition:opacity .5s ease}
-.bow-premium-extra path{stroke:var(--gold);stroke-width:3.5;fill:none}
-.bow-premium-extra .spark{fill:#eec25e;stroke:none}
-#bow.premium .bow-stroke path{stroke:var(--gold)}
-#bow.premium .bow-premium-extra{opacity:1}
-
-/* dodatki na scenie */
-.addon{
-  transform-box:fill-box;transform-origin:center;
-  transform:scale(0) rotate(-20deg);opacity:0;
-  transition:transform .7s var(--spring),opacity .35s ease;
-}
-.addon.on{transform:scale(1) rotate(0deg);opacity:1}
-.addon-label{
-  font-family:'Caveat',cursive;font-size:22px;fill:var(--ink-soft);
-  text-anchor:middle;
-}
-.card-script{font-family:'Caveat',cursive;font-size:24px;fill:var(--pink-dark);text-anchor:middle}
-.card-heart{font-size:15px;fill:var(--pink);text-anchor:middle}
+.opt.sel .opt-thumb{transform:scale(1.08);box-shadow:0 0 0 2.5px #fff,0 0 0 4.5px var(--pink),0 4px 10px rgba(92,36,56,.25)}
 
 /* ─── podsumowanie (prawa kolumna) ─── */
 .summary{position:sticky;top:18px;text-align:center}
@@ -270,6 +289,8 @@ body{
 /* ─── stopka ─── */
 .bottom{margin-top:26px;text-align:center}
 .bottom p{font-size:.82rem;color:var(--ink-soft);max-width:640px;margin:0 auto}
+.bottom .credits{margin-top:8px;font-size:.68rem;color:#c2a1ad}
+.bottom .credits a{color:inherit}
 
 /* ─── modal ─── */
 .modal{
